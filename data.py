@@ -33,6 +33,13 @@ val_transforms = A.Compose(
     ]
 )
 
+test_transforms = A.Compose(
+    [
+        A.Resize(height=384, width=384),
+        ToTensor()
+    ]
+)
+
 class DeeperDataset(Dataset):
     def __init__(self, file_list, transform=None):
         self.file_list = file_list
@@ -54,10 +61,10 @@ class DeeperDataset(Dataset):
 
 def load_data(args):
 
-    train_dir = '/home/liu/deepfake_detection/VIT/data/FF++/val_all/c23/'
-    train_list = glob.glob(os.path.join(train_dir,'*6_*_*.png'))
+    train_dir = '/home/liu/deepfake_detection/VIT/data/FF++/train_all/c23/'
+    train_list = glob.glob(os.path.join(train_dir,'*.png'))
     val_dir = '/home/liu/deepfake_detection/VIT/data/FF++/val_all/c23/'
-    val_list = glob.glob(os.path.join(val_dir,'*8_*_*.png'))
+    val_list = glob.glob(os.path.join(val_dir,'*.png'))
     print(len(train_list))
     print(len(val_list))
 
@@ -71,16 +78,16 @@ def load_data(args):
 
 if __name__ == '__main__':
     args = load_config()
-    train_data, _ = load_data(args)
-    for data, label in tqdm(train_data):
-        data = data['image']
-        #data = data.to('cuda')
-        #label = label.to('cuda')
-        print(data[0].shape)
-        data = np.uint8(data[0])
-        img = np.stack([data[0, :, :], data[1, :, :], data[2, :, :]], axis=2)
-        print(img.shape)
-        data = Image.fromarray(img)
-        data.save('test.png')
-        break
-
+    # train_data, _ = load_data(args)
+    # for data, label in tqdm(train_data):
+    #     data = data['image']
+    #     #data = data.to('cuda')
+    #     #label = label.to('cuda')
+    #     print(data[0].shape)
+    #     data = np.uint8(data[0])
+    #     img = np.stack([data[0, :, :], data[1, :, :], data[2, :, :]], axis=2)
+    #     print(img.shape)
+    #     data = Image.fromarray(img)
+    #     data.save('test.png')
+    #     break
+   # load_test(args)
