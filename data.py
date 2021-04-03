@@ -4,10 +4,11 @@ from torch.utils.data import DataLoader, Dataset
 from PIL import Image
 from tqdm import tqdm
 import albumentations as A
-from albumentations.pytorch import ToTensor
+from albumentations.pytorch import ToTensorV2
 import numpy as np
 import cv2 as cv
 from config import load_config
+from torchvision import transforms
 
 train_transforms = A.Compose(
     [
@@ -22,21 +23,18 @@ train_transforms = A.Compose(
             A.ColorJitter(contrast=0.2),
             A.ColorJitter(saturation=0.2),
         ], p=0.3),
-        ToTensor(),
     ]
 )
 
 val_transforms = A.Compose(
     [
         A.Resize(height=384, width=384),
-        ToTensor()
     ]
 )
 
 test_transforms = A.Compose(
     [
         A.Resize(height=384, width=384),
-        ToTensor()
     ]
 )
 
@@ -44,6 +42,9 @@ class DeeperDataset(Dataset):
     def __init__(self, file_list, transform=None):
         self.file_list = file_list
         self.transform = transform
+        self.as_tensor = transforms.Compose([
+            transforms.ToTensor(),
+            ])
 
     def __len__(self):
         self.filelength = len(self.file_list)
@@ -54,6 +55,7 @@ class DeeperDataset(Dataset):
         img = Image.open(img_path)
         #print(img_path)
         img_transformed = self.transform(image = np.array(img))
+        img_transformed = self.as_tensor(img_transformed['image'])
         label = img_path.split("/")[-1].split(".")[0].split("_")[-1]
         label = 1 if label == "fake" else 0
 
@@ -61,9 +63,9 @@ class DeeperDataset(Dataset):
 
 def load_data(args):
 
-    train_dir = '/home/liu/deepfake_detection/VIT/data/FF++/train_all/c23/'
+    train_dir = '/home/liu/qsc/VIT/data/FF++/train_all/c23'
     train_list = glob.glob(os.path.join(train_dir,'*.png'))
-    val_dir = '/home/liu/deepfake_detection/VIT/data/FF++/val_all/c23/'
+    val_dir = '/home/liu/qsc/VIT/data/FF++/val_all/c23'
     val_list = glob.glob(os.path.join(val_dir,'*.png'))
     print(len(train_list))
     print(len(val_list))

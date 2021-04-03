@@ -4,8 +4,8 @@ def load_config():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--batch_size', type=int, default=8)
-    parser.add_argument('--lr', type=float, default=0.1)
+    parser.add_argument('--batch_size', type=int, default=40)
+    parser.add_argument('--lr', type=float, default=0.003)
     parser.add_argument('--weight_decay', type=float, default=3e-4)
     parser.add_argument('--momentum', type=float, default=0.9)
     parser.add_argument('--cuda', type=bool, default=True)
