@@ -4,27 +4,22 @@ import torch.nn as nn
 from tqdm import tqdm
 from config import load_config
 from data import load_data
-from model import Net
+from model import vit,Resvit,Densevit,Densevit_edge,dense_egde_vit_params
 import torch.optim as optim
 from tensorboardX import SummaryWriter
 import torch.nn.functional as F
 import datetime
 
-# auc曲线计算
-# CrossEntropyLoss回顾
-# softmax计算
-# 数据增强方法
-# git上传代码
-
 def main(args):
 
     train_loader, valid_loader = load_data(args)
-    model = Net()
+    model = Resvit()
     model = nn.DataParallel(model)
     model.cuda()
-    optimizer = optim.SGD(model.parameters(), lr=args.lr, weight_decay=args.weight_decay, momentum=args.momentum)
+    params = dense_egde_vit_params(model, args.lr)
+    optimizer = torch.optim.Adam(params, lr=args.lr, weight_decay=args.weight_decay)
     criterion = nn.CrossEntropyLoss()
-    lr_scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=2, eta_min=0.0001)
+    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=args.gamma)
     writer = SummaryWriter()
 
     for epoch in range(args.epochs):
@@ -38,6 +33,7 @@ def main(args):
             #print(data)
             #print(label)
             #start = time.time()
+            # Log = LoG(data,window,9)
             output = model(data)
             #print(output)
             optimizer.zero_grad()

@@ -63,9 +63,9 @@ class DeeperDataset(Dataset):
 
 def load_data(args):
 
-    train_dir = '/home/liu/qsc/VIT/data/FF++/train_all/c23'
+    train_dir = './data'
     train_list = glob.glob(os.path.join(train_dir,'*.png'))
-    val_dir = '/home/liu/qsc/VIT/data/FF++/val_all/c23'
+    val_dir = './data'
     val_list = glob.glob(os.path.join(val_dir,'*.png'))
     print(len(train_list))
     print(len(val_list))
