@@ -4,7 +4,7 @@ import torch.nn as nn
 from tqdm import tqdm
 from config import load_config
 from data import load_data
-from model import vit,Resvit,Densevit,Densevit_edge,dense_egde_vit_params
+from model import vit,Resvit,ResNet
 import torch.optim as optim
 from tensorboardX import SummaryWriter
 import torch.nn.functional as F
@@ -13,13 +13,13 @@ import datetime
 def main(args):
 
     train_loader, valid_loader = load_data(args)
-    model = Resvit()
-    model = nn.DataParallel(model)
+    model = ResNet()
+    #model = nn.DataParallel(model)
     model.cuda()
-    params = dense_egde_vit_params(model, args.lr)
-    optimizer = torch.optim.Adam(params, lr=args.lr, weight_decay=args.weight_decay)
+    #params = dense_egde_vit_params(model, args.lr)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     criterion = nn.CrossEntropyLoss()
-    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=args.gamma)
+    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=args.gamma)
     writer = SummaryWriter()
 
     for epoch in range(args.epochs):
@@ -51,8 +51,8 @@ def main(args):
             #print(end-start)
             #break
         lr_scheduler.step()
-        writer.add_scalar('scalar/train_loss', epoch_loss, epoch)
-        writer.add_scalar('scalar/train_acc', epoch_accuracy, epoch)
+        # writer.add_scalar('scalar/train_loss', epoch_loss, epoch)
+        # writer.add_scalar('scalar/train_acc', epoch_accuracy, epoch)
         print(
             f"Epoch : {epoch + 1}  - train_loss : {epoch_loss:.4f} - train_acc: {epoch_accuracy:.4f}\n"
         )
@@ -75,10 +75,10 @@ def main(args):
                 print(
                     f"Epoch : {epoch + 1}  - val_loss : {epoch_val_loss:.4f} - val_acc: {epoch_val_accuracy:.4f}\n"
                 )
-                if epoch_val_accuracy > 0.90:
-                    torch.save(model, "./Model/model_FF++_HQ_"+str(epoch_val_accuracy.item())+".pkl")
-                writer.add_scalar('scalar/val_loss', epoch_val_loss, epoch)
-                writer.add_scalar('scalar/val_acc', epoch_val_accuracy, epoch)
+                # if epoch_val_accuracy > 0.90:
+                #     torch.save(model, "./Model/model_FF++_HQ_"+str(epoch_val_accuracy.item())+".pkl")
+                # writer.add_scalar('scalar/val_loss', epoch_val_loss, epoch)
+                # writer.add_scalar('scalar/val_acc', epoch_val_accuracy, epoch)
 
 if __name__ == '__main__':
     args = load_config()
